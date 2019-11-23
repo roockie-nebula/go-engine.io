@@ -1,6 +1,7 @@
 package engineio
 
 import (
+	"context"
 	"io"
 	"net"
 	"net/http"
@@ -147,6 +148,12 @@ func (s *session) RemoteHeader() http.Header {
 	s.upgradeLocker.RLock()
 	defer s.upgradeLocker.RUnlock()
 	return s.conn.RemoteHeader()
+}
+
+func (s *session) RequestContext() context.Context {
+	s.upgradeLocker.RLock()
+	defer s.upgradeLocker.RUnlock()
+	return s.conn.RequestContext()
 }
 
 func (s *session) nextReader() (base.FrameType, base.PacketType, io.ReadCloser, error) {

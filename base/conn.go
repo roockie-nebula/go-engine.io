@@ -1,6 +1,7 @@
 package base
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -86,6 +87,7 @@ type Conn interface {
 	LocalAddr() net.Addr
 	RemoteAddr() net.Addr
 	RemoteHeader() http.Header
+	RequestContext() context.Context
 	SetReadDeadline(t time.Time) error
 	SetWriteDeadline(t time.Time) error
 }

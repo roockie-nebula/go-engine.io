@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"context"
 	"crypto/tls"
 	"net"
 	"net/http"
@@ -50,6 +51,7 @@ func (t *Transport) Dial(u *url.URL, requestHeader http.Header) (base.Conn, erro
 		HandshakeTimeout: t.HandshakeTimeout,
 		Subprotocols:     t.Subprotocols,
 	}
+	ctx := context.Background()
 	switch u.Scheme {
 	case "http":
 		u.Scheme = "ws"
@@ -60,7 +62,7 @@ func (t *Transport) Dial(u *url.URL, requestHeader http.Header) (base.Conn, erro
 	query.Set("transport", t.Name())
 	query.Set("t", base.Timestamp())
 	u.RawQuery = query.Encode()
-	c, resp, err := dialer.Dial(u.String(), requestHeader)
+	c, resp, err := dialer.DialContext(ctx, u.String(), requestHeader)
 	if err != nil {
 		return nil, DialError{
 			error:    err,
@@ -68,7 +70,7 @@ func (t *Transport) Dial(u *url.URL, requestHeader http.Header) (base.Conn, erro
 		}
 	}
 
-	return newConn(c, *u, resp.Header), nil
+	return newConn(c, *u, resp.Header, ctx), nil
 }
 
 // Accept accepts a http request and create Conn.
@@ -83,5 +85,5 @@ func (t *Transport) Accept(w http.ResponseWriter, r *http.Request) (base.Conn, e
 		return nil, err
 	}
 
-	return newConn(c, *r.URL, r.Header), nil
+	return newConn(c, *r.URL, r.Header, r.Context()), nil
 }

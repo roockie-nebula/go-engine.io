@@ -2,6 +2,7 @@ package polling
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -97,6 +98,10 @@ func (c *clientConn) RemoteHeader() http.Header {
 		return nil
 	}
 	return ret.(http.Header)
+}
+
+func (c *clientConn) RequestContext() context.Context {
+	return c.request.Context()
 }
 
 func (c *clientConn) Resume() {

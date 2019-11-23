@@ -2,6 +2,7 @@ package polling
 
 import (
 	"bytes"
+	"context"
 	"html/template"
 	"net"
 	"net/http"
@@ -16,6 +17,7 @@ type serverConn struct {
 	supportBinary bool
 
 	remoteHeader http.Header
+	requestContext context.Context
 	localAddr    Addr
 	remoteAddr   Addr
 	url          url.URL
@@ -33,6 +35,7 @@ func newServerConn(r *http.Request) base.Conn {
 		Payload:       payload.New(supportBinary),
 		supportBinary: supportBinary,
 		remoteHeader:  r.Header,
+		requestContext: r.Context(),
 		localAddr:     Addr{r.Host},
 		remoteAddr:    Addr{r.RemoteAddr},
 		url:           *r.URL,
@@ -54,6 +57,10 @@ func (c *serverConn) RemoteAddr() net.Addr {
 
 func (c *serverConn) RemoteHeader() http.Header {
 	return c.remoteHeader
+}
+
+func (c *serverConn) RequestContext() context.Context {
+	return c.requestContext
 }
 
 func (c *serverConn) ServeHTTP(w http.ResponseWriter, r *http.Request) {

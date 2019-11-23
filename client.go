@@ -1,6 +1,7 @@
 package engineio
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net"
@@ -146,6 +147,10 @@ func (c *client) RemoteAddr() net.Addr {
 
 func (c *client) RemoteHeader() http.Header {
 	return c.conn.RemoteHeader()
+}
+
+func (c *client) RequestContext() context.Context {
+	return c.conn.RequestContext()
 }
 
 func (c *client) serve() {
